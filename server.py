@@ -9,10 +9,13 @@ app = Flask(__name__)
 CORS(app)
 
 
-def parse_image(img_src):
+def parse_image(img_src,filename):
+    
     np_image = base64.b64decode(img_src)
     image = np.asarray(bytearray(np_image),dtype="uint8") 
+    
     image = cv2.imdecode(image, cv2.IMREAD_COLOR)
+    cv2.imwrite(filename,image)
     return image
     
 """
@@ -30,7 +33,9 @@ def test():
     try:
         result = request.get_json()
         origin_image = result['origin_image']
-        origin_image = parse_image(origin_image)
+        golden_image = result['golden_image']
+        origin_image = parse_image(origin_image,'origin.png')
+        golden_image = parse_image(golden_image,'golden.png')
         
         processed_image = pack_image(origin_image)
         
